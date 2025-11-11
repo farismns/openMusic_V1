@@ -32,7 +32,7 @@ class AlbumModel {
       const result = await db.query(query, [id]);
 
       if (result.rowCount === 0) {
-        return null; // ❗ Jangan throw error, biar handler tangani sebagai 404
+        return null;
       }
 
       return result.rows[0];
