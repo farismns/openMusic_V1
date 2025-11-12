@@ -1,4 +1,3 @@
-// src/models/AlbumModel.js
 const { nanoid } = require('nanoid');
 const Database = require('../config/database');
 

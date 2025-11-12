@@ -4,61 +4,67 @@ const postSongHandler = async (request, h) => {
   try {
     const { title, year, genre, performer, duration, albumId } = request.payload;
 
-    if (!title || !year || !genre || !performer) {
-      const response = h.response({
-        status: 'fail',
-        message: 'Gagal menambahkan lagu. Mohon isi semua data yang wajib diisi',
-      });
-      response.code(400);
-      return response;
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menambahkan lagu. Mohon isi judul lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (!year || typeof year !== 'number' || year < 1000 || year > new Date().getFullYear()) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menambahkan lagu. Mohon isi tahun lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (!genre || typeof genre !== 'string' || genre.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menambahkan lagu. Mohon isi genre lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (!performer || typeof performer !== 'string' || performer.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menambahkan lagu. Mohon isi performer lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (albumId && typeof albumId !== 'string') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menambahkan lagu. Mohon isi albumId dengan benar',
+        })
+        .code(400);
     }
 
     const songId = await SongModel.addSong({ title, year, genre, performer, duration, albumId });
 
-    const response = h.response({
-      status: 'success',
-      data: { songId },
-    });
-    response.code(201);
-    return response;
+    return h
+      .response({
+        status: 'success',
+        data: { songId },
+      })
+      .code(201);
   } catch (error) {
     console.error('Error in postSongHandler:', error);
-    const response = h.response({
-      status: 'error',
-      message: 'Terjadi kesalahan pada server',
-    });
-    response.code(500);
-    return response;
-  }
-};
-
-const getSongsHandler = async (request, h) => {
-  try {
-    const songs = await SongModel.getSongs();
-    return { status: 'success', data: { songs } };
-  } catch (error) {
-    console.error('Error in getSongsHandler:', error);
-    const response = h.response({
-      status: 'error',
-      message: 'Terjadi kesalahan pada server',
-    });
-    response.code(500);
-    return response;
-  }
-};
-
-const getSongByIdHandler = async (request, h) => {
-  try {
-    const { id } = request.params;
-    const song = await SongModel.getSongById(id);
-    return { status: 'success', data: { song } };
-  } catch (error) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Lagu tidak ditemukan',
-    });
-    response.code(404);
-    return response;
+    return h
+      .response({
+        status: 'error',
+        message: 'Terjadi kesalahan pada server',
+      })
+      .code(500);
   }
 };
 
@@ -67,31 +73,165 @@ const putSongByIdHandler = async (request, h) => {
     const { id } = request.params;
     const { title, year, genre, performer, duration, albumId } = request.payload;
 
-    await SongModel.editSongById(id, { title, year, genre, performer, duration, albumId });
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Mohon isi judul lagu dengan benar',
+        })
+        .code(400);
+    }
 
-    return { status: 'success', message: 'Lagu berhasil diperbarui' };
-  } catch (error) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Gagal memperbarui lagu. Id tidak ditemukan',
+    if (!year || typeof year !== 'number' || year < 1000 || year > new Date().getFullYear()) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Mohon isi tahun lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (!genre || typeof genre !== 'string' || genre.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Mohon isi genre lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (!performer || typeof performer !== 'string' || performer.trim() === '') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Mohon isi performer lagu dengan benar',
+        })
+        .code(400);
+    }
+
+    if (albumId && typeof albumId !== 'string') {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Mohon isi albumId dengan benar',
+        })
+        .code(400);
+    }
+
+    const updated = await SongModel.editSongById(id, {
+      title,
+      year,
+      genre,
+      performer,
+      duration,
+      albumId,
     });
-    response.code(404);
-    return response;
+
+    if (!updated) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal memperbarui lagu. Id tidak ditemukan',
+        })
+        .code(404);
+    }
+
+    return h
+      .response({
+        status: 'success',
+        message: 'Lagu berhasil diperbarui',
+      })
+      .code(200);
+  } catch (error) {
+    console.error('Error in putSongByIdHandler:', error);
+    return h
+      .response({
+        status: 'error',
+        message: 'Terjadi kesalahan pada server',
+      })
+      .code(500);
+  }
+};
+
+const getSongsHandler = async (request, h) => {
+  try {
+    const songs = await SongModel.getSongs();
+    return h
+      .response({
+        status: 'success',
+        data: { songs },
+      })
+      .code(200);
+  } catch (error) {
+    console.error('Error in getSongsHandler:', error);
+    return h
+      .response({
+        status: 'error',
+        message: 'Terjadi kesalahan pada server',
+      })
+      .code(500);
+  }
+};
+
+const getSongByIdHandler = async (request, h) => {
+  try {
+    const { id } = request.params;
+    const song = await SongModel.getSongById(id);
+
+    if (!song) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Lagu tidak ditemukan',
+        })
+        .code(404);
+    }
+
+    return h
+      .response({
+        status: 'success',
+        data: { song },
+      })
+      .code(200);
+  } catch (error) {
+    console.error('Error in getSongByIdHandler:', error);
+    return h
+      .response({
+        status: 'error',
+        message: 'Terjadi kesalahan pada server',
+      })
+      .code(500);
   }
 };
 
 const deleteSongByIdHandler = async (request, h) => {
   try {
     const { id } = request.params;
-    await SongModel.deleteSongById(id);
-    return { status: 'success', message: 'Lagu berhasil dihapus' };
+    const deleted = await SongModel.deleteSongById(id);
+
+    if (!deleted) {
+      return h
+        .response({
+          status: 'fail',
+          message: 'Gagal menghapus lagu. Id tidak ditemukan',
+        })
+        .code(404);
+    }
+
+    return h
+      .response({
+        status: 'success',
+        message: 'Lagu berhasil dihapus',
+      })
+      .code(200);
   } catch (error) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Gagal menghapus lagu. Id tidak ditemukan',
-    });
-    response.code(404);
-    return response;
+    console.error('Error in deleteSongByIdHandler:', error);
+    return h
+      .response({
+        status: 'error',
+        message: 'Terjadi kesalahan pada server',
+      })
+      .code(500);
   }
 };
 

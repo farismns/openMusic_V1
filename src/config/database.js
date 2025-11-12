@@ -41,7 +41,4 @@ class Database {
   }
 }
 
-const db = new Database();
-db.init();
-
 module.exports = Database;
