@@ -155,7 +155,9 @@ const putSongByIdHandler = async (request, h) => {
 
 const getSongsHandler = async (request, h) => {
   try {
-    const songs = await SongModel.getSongs();
+    const { title, performer } = request.query;
+    const songs = await SongModel.getSongs({ title, performer });
+
     return h
       .response({
         status: 'success',

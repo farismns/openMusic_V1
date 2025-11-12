@@ -24,9 +24,27 @@ class SongModel {
     }
   }
 
-  async getSongs() {
+  async getSongs({ title, performer } = {}) {
     try {
-      const result = await db.query('SELECT id, title, performer FROM songs');
+      let baseQuery = 'SELECT id, title, performer FROM songs';
+      const values = [];
+      const conditions = [];
+
+      if (title) {
+        values.push(`%${title.toLowerCase()}%`);
+        conditions.push(`LOWER(title) LIKE $${values.length}`);
+      }
+
+      if (performer) {
+        values.push(`%${performer.toLowerCase()}%`);
+        conditions.push(`LOWER(performer) LIKE $${values.length}`);
+      }
+
+      if (conditions.length > 0) {
+        baseQuery += ` WHERE ${conditions.join(' AND ')}`;
+      }
+
+      const result = await db.query(baseQuery, values);
       return result.rows;
     } catch (error) {
       console.error('Error in getSongs:', error);

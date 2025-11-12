@@ -24,7 +24,7 @@ const routes = [
     handler: albumsHandler.deleteAlbumByIdHandler,
   },
 
-  // SONGS ROUTE
+  // SONGS ROUTES
   {
     method: 'POST',
     path: '/songs',

@@ -27,14 +27,29 @@ class AlbumModel {
 
   async getAlbumById(id) {
     try {
-      const query = 'SELECT * FROM albums WHERE id = $1';
-      const result = await db.query(query, [id]);
+      const albumQuery = `
+        SELECT id, name, year
+        FROM albums
+        WHERE id = $1
+      `;
+      const albumResult = await db.query(albumQuery, [id]);
 
-      if (result.rowCount === 0) {
+      if (albumResult.rowCount === 0) {
         return null;
       }
 
-      return result.rows[0];
+      const album = albumResult.rows[0];
+
+      const songsQuery = `
+        SELECT id, title, performer
+        FROM songs
+        WHERE album_id = $1
+      `;
+      const songsResult = await db.query(songsQuery, [id]);
+
+      album.songs = songsResult.rows;
+
+      return album;
     } catch (error) {
       console.error('Error in getAlbumById:', error.message);
       throw error;
@@ -64,7 +79,11 @@ class AlbumModel {
 
   async deleteAlbumById(id) {
     try {
-      const query = 'DELETE FROM albums WHERE id = $1 RETURNING id';
+      const query = `
+        DELETE FROM albums
+        WHERE id = $1
+        RETURNING id
+      `;
       const result = await db.query(query, [id]);
 
       if (result.rowCount === 0) {
