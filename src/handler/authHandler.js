@@ -7,17 +7,17 @@ const postAuthHandler = async (request, h) => {
   try {
     const { username, password } = request.payload;
 
-    if (!username || !password) {
+    if (!username || typeof username !== 'string' || username.trim() === '' || !password || typeof password !== 'string' || password.trim() === '') {
       return h
         .response({
           status: 'fail',
-          message: 'Gagal melakukan autentikasi. Username dan password wajib diisi.',
+          message: 'Username dan password wajib diisi dan harus berupa string.',
         })
         .code(400);
     }
 
     const user = await UserModel.getPasswordByUsername(username);
-    if (!user) {
+    if (!user || typeof user.password !== 'string') {
       return h
         .response({
           status: 'fail',
@@ -62,11 +62,11 @@ const putAuthHandler = async (request, h) => {
   try {
     const { refreshToken } = request.payload;
 
-    if (!refreshToken) {
+    if (!refreshToken || typeof refreshToken !== 'string' || refreshToken.trim() === '') {
       return h
         .response({
           status: 'fail',
-          message: 'Refresh token wajib diisi.',
+          message: 'Refresh token wajib diisi dan harus berupa string.',
         })
         .code(400);
     }
@@ -115,11 +115,11 @@ const deleteAuthHandler = async (request, h) => {
   try {
     const { refreshToken } = request.payload;
 
-    if (!refreshToken) {
+    if (!refreshToken || typeof refreshToken !== 'string' || refreshToken.trim() === '') {
       return h
         .response({
           status: 'fail',
-          message: 'Refresh token wajib diisi.',
+          message: 'Refresh token wajib diisi dan harus berupa string.',
         })
         .code(400);
     }

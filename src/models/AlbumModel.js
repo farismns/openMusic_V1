@@ -1,7 +1,5 @@
 const { nanoid } = require('nanoid');
-const Database = require('../config/database');
-
-const db = new Database();
+const db = require('../config/database');
 
 class AlbumModel {
   async addAlbum({ name, year }) {

@@ -3,6 +3,7 @@ const songsHandler = require('../handler/songsHandler');
 const userHandler = require('../handler/userHandler');
 const authHandler = require('../handler/authHandler');
 const playlistHandler = require('../handler/playlistHandler');
+const collaborationHandler = require('../handler/collaborationHandler');
 
 const routes = [
   // ALBUMS ROUTES
@@ -107,6 +108,23 @@ const routes = [
     method: 'DELETE',
     path: '/playlists/{id}/songs',
     handler: playlistHandler.deleteSongFromPlaylistHandler,
+  },
+
+  // COLLABS ROUTES
+  {
+    method: 'POST',
+    path: '/collaborations',
+    handler: collaborationHandler.postCollaborationHandler,
+  },
+  {
+    method: 'DELETE',
+    path: '/collaborations',
+    handler: collaborationHandler.deleteCollaborationHandler,
+  },
+  {
+    method: 'GET',
+    path: '/playlists/{id}/activities',
+    handler: playlistHandler.getPlaylistActivitiesHandler,
   },
 ];
 
